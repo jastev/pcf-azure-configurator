@@ -19,8 +19,6 @@ namespace PcfAzureConfigurator.Helpers
             handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
 
             HttpClient = new HttpClient(handler);
-            HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
         }
 
         public void Dispose()

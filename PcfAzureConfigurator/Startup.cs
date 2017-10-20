@@ -27,6 +27,7 @@ namespace PcfAzureConfigurator
             services.AddMvc();
             services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
             services.AddSingleton<IUaaHelper, UaaHelper>();
+            services.AddSingleton<IDirectorHelper, DirectorHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

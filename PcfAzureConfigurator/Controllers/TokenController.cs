@@ -22,7 +22,7 @@ namespace PcfAzureConfigurator.Controllers
         [HttpPost]
         public async Task<JsonResult> PostJson([FromBody] TokenRequest request)
         {
-            string token = await _uaaHelper.GetToken(request.OpsManagerFqdn, request.Username, request.Password);
+            var token = await _uaaHelper.GetToken(request.OpsManagerFqdn, request.Username, request.Password);
             return new JsonResult(new { token = token });
         }
 
