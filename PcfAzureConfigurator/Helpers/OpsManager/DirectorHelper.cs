@@ -20,7 +20,7 @@ namespace PcfAzureConfigurator.Helpers.OpsManager
         public async Task<DirectorProperties> GetProperties(string opsManagerFqdn, string token)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://" + opsManagerFqdn + "/api/v0/staged/director/properties");
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            requestMessage.Headers.Authorization = OauthToken.GetAuthenticationHeader(token);
             var response = await _httpclientProvider.HttpClient.SendAsync(requestMessage);
 
             if (response.IsSuccessStatusCode)

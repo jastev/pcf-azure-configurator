@@ -7,6 +7,6 @@ namespace PcfAzureConfigurator.Helpers.OpsManager
 {
     public interface IUaaHelper
     {
-        Task<string> GetToken(string opsManagerFqdn, string username, string password);
+        Task<OauthToken> GetToken(string opsManagerFqdn, string username, string password);
     }
 }

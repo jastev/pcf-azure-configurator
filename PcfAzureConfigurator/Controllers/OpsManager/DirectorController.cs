@@ -9,7 +9,7 @@ using PcfAzureConfigurator.Helpers.OpsManager;
 namespace PcfAzureConfigurator.Controllers
 {
     [Produces("application/json")]
-    [Route("api/v0/director")]
+    [Route("api/v0/opsmanager/director")]
     public class DirectorController : Controller
     {
         private IDirectorHelper _directorHelper;

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PcfAzureConfigurator.Helpers;
 using PcfAzureConfigurator.Helpers.OpsManager;
+using PcfAzureConfigurator.Helpers.Azure;
 
 namespace PcfAzureConfigurator
 {
@@ -26,8 +27,10 @@ namespace PcfAzureConfigurator
         {
             services.AddMvc();
             services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
+            services.AddSingleton<IOauthHelper, OauthHelper>();
             services.AddSingleton<IUaaHelper, UaaHelper>();
             services.AddSingleton<IDirectorHelper, DirectorHelper>();
+            services.AddSingleton<IActiveDirectoryHelper, ActiveDirectoryHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
