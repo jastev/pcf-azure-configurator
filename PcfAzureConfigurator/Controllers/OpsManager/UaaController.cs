@@ -28,11 +28,11 @@ namespace PcfAzureConfigurator.Controllers
             try
             {
                 var token = await _uaaHelper.GetToken(request.OpsManagerFqdn, request.Username, request.Password);
-                result = new JsonResult(new { token = token });
+                result = new JsonResult(new { result = token });
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(e.Response.Content);
+                result = new JsonResult(new { error = e.Response.Content });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;

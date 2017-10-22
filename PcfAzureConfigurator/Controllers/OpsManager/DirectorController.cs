@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PcfAzureConfigurator.Helpers.OpsManager;
+using PcfAzureConfigurator.Helpers;
 
 namespace PcfAzureConfigurator.Controllers
 {
@@ -20,10 +21,20 @@ namespace PcfAzureConfigurator.Controllers
         }
 
         [HttpGet]
-        public async Task<DirectorProperties> Get(string opsManagerFqdn, string token)
+        public async Task<JsonResult> Get(string opsManagerFqdn, string token)
         {
-            var properties = await _directorHelper.GetProperties(opsManagerFqdn, token);
-            return properties;
+            JsonResult result;
+            try
+            {
+                var properties = await _directorHelper.GetProperties(opsManagerFqdn, token);
+                result = new JsonResult(new { result = properties });
+            }
+            catch (HttpResponseException e)
+            {
+                result = new JsonResult(new { error = e.Response.Content });
+                result.StatusCode = (int)e.Response.StatusCode;
+            }
+            return result;
         }
 
         [HttpPut("{id}")]

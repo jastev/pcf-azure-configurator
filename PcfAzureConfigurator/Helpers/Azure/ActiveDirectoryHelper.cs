@@ -14,17 +14,17 @@ namespace PcfAzureConfigurator.Helpers.Azure
             _oauthHelper = oauthHelper;
         }
 
-        public async Task<OauthToken> GetToken(string environment, string tenantId, string clientId, string clientSecret)
+        public async Task<OauthToken> GetToken(string environmentName, string tenantId, string clientId, string clientSecret)
         {
-            AzureEnvironment cloud;
-            EnvironmentHelper.Environments.TryGetValue(environment, out cloud);
-            var uri = cloud.ActiveDirectoryEndpointUrl + "/" + tenantId + "/oauth2/token";
+            AzureEnvironment environment;
+            EnvironmentHelper.Environments.TryGetValue(environmentName, out environment);
+            var uri = environment.Endpoints.ActiveDirectory + "/" + tenantId + "/oauth2/token";
             var parameters = new Dictionary<string, string>
             {
                 { "grant_type", "client_credentials" },
                 { "client_id", clientId },
                 { "client_secret", clientSecret },
-                { "resource", cloud.ResourceManagerEndpointUrl },
+                { "resource", environment.Endpoints.ResourceManager + "/"}, // The slash is required for subsequent authorization of requests to the endpoint
                 { "scope", "user_impersonation" },
             };
 
