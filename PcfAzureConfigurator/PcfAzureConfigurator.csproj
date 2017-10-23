@@ -22,7 +22,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ClientApp\app\services\" />
+    <None Remove="ClientApp\app\services\azure\activedirectory.service.ts" />
+    <None Remove="ClientApp\app\services\azure\resourcegroups.service.ts" />
+    <None Remove="ClientApp\app\services\oauthtoken.ts" />
+    <None Remove="ClientApp\app\services\serviceresult.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\app\services\azure\activedirectory.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\azure\resourcegroups.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\oauthtoken.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\opsmanager\director.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\opsmanager\uaa.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\serviceresult.ts" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">
