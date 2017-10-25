@@ -1,4 +1,4 @@
-﻿export class ServiceResult {
-    result: Object;
-    error: Object;
+﻿export interface ServiceResult {
+    result?: Object;
+    error?: Object;
 }

@@ -6,13 +6,12 @@ import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class UaaService {
-    private token: OauthToken;
+    public token: OauthToken;
     private timestamp: number;
     private http: Http;
     private baseUrl: string;
 
     constructor(http: Http, @Inject('BASE_URL') baseUrl: string) {
-        this.token
         this.http = http;
         this.baseUrl = baseUrl;
     }
