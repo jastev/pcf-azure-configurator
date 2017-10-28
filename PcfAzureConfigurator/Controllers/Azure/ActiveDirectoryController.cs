@@ -9,8 +9,8 @@ using PcfAzureConfigurator.Helpers.Azure;
 
 namespace PcfAzureConfigurator.Controllers
 {
+    [Route("api/v0/azure/{environment}/activedirectory/{tenantId}")]
     [Produces("application/json")]
-    [Route("api/v0/azure/activedirectory")]
     public class ActiveDirectoryController : Controller
     {
         private IActiveDirectoryHelper _activeDirectoryHelper;
@@ -20,14 +20,14 @@ namespace PcfAzureConfigurator.Controllers
             _activeDirectoryHelper = activeDirectoryHelper;
         }
 
-        [Route("token")]
+        [Route("client/{clientId}/authenticate")]
         [HttpPost]
-        public async Task<JsonResult> PostJson([FromBody] ActiveDirectoryTokenRequest request)
+        public async Task<JsonResult> GetToken(string environment, string tenantId, string clientId, [FromBody] string clientSecret)
         {
             JsonResult result;
             try
             {
-                var token = await _activeDirectoryHelper.GetToken(request.Environment, request.TenantId, request.ClientId, request.ClientSecret);
+                var token = await _activeDirectoryHelper.GetToken(environment, tenantId, clientId, clientSecret);
                 result = new JsonResult(new { result = token });
             }
             catch (HttpResponseException e)
@@ -36,14 +36,6 @@ namespace PcfAzureConfigurator.Controllers
                 result.StatusCode = (int) e.Response.StatusCode;
             }
             return result;
-        }
-
-        public class ActiveDirectoryTokenRequest
-        {
-            public string Environment { get; set; }
-            public string TenantId { get; set; }
-            public string ClientId { get; set; }
-            public string ClientSecret { get; set; }
         }
     }
 }

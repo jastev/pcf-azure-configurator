@@ -7,11 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using PcfAzureConfigurator.Helpers;
 using PcfAzureConfigurator.Helpers.Azure;
 using Microsoft.Extensions.Primitives;
+using PcfAzureConfigurator.Helpers.Azure.ResourceGroups;
 
 namespace PcfAzureConfigurator.Controllers.Azure
 {
+    [Route("api/v0/azure/{environment}/subscriptions/{subscriptionId}/resourcegroups")]
     [Produces("application/json")]
-    [Route("api/v0/azure/resourcegroups")]
     public class ResourceGroupsController : Controller
     {
         private IResourceGroupsHelper _resourceGroupsHelper;
@@ -21,12 +22,49 @@ namespace PcfAzureConfigurator.Controllers.Azure
             _resourceGroupsHelper = resourceGroupsHelper;
         }
 
+        [HttpGet]
+        public async Task<JsonResult> List(string environment, string subscriptionId)
+        {
+            var token = OauthToken.GetToken(HttpContext.Request.Headers);
+
+            JsonResult result;
+            try
+            {
+                var resourceGroups = await _resourceGroupsHelper.List(environment, token, subscriptionId);
+                result = new JsonResult(new { result = resourceGroups });
+            }
+            catch (HttpResponseException e)
+            {
+                result = new JsonResult(new { error = e.Response.Content });
+                result.StatusCode = (int)e.Response.StatusCode;
+            }
+            return result;
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> Create(string environment, string subscriptionId, [FromBody] ResourceGroup resourceGroup)
+        {
+            var token = OauthToken.GetToken(HttpContext.Request.Headers);
+
+            JsonResult result;
+            try
+            {
+                await _resourceGroupsHelper.Create(environment, token, subscriptionId, resourceGroup);
+                result = new JsonResult(null);
+            }
+            catch (HttpResponseException e)
+            {
+                result = new JsonResult(new { error = e.Response.Content });
+                result.StatusCode = (int)e.Response.StatusCode;
+            }
+            return result;
+        }
+
+        [Route("{resourceGroupName}")]
+        [HttpGet]
         public async Task<JsonResult> Get(string environment, string subscriptionId, string resourceGroupName)
         {
-            StringValues authorizationValues;
-            HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationValues);
-            if (authorizationValues.Count != 1) { /* TODO */ }
-            var token = authorizationValues.First().Split(' ', 2)[1];  // Split off the preceding token type (should be "Bearer")
+            var token = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try

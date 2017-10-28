@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace PcfAzureConfigurator.Helpers
 {
-    public interface IHttpClientProvider
+    public interface IHttpClient : IDisposable
     {
-        HttpClient HttpClient { get; }
+        Task<HttpResponseMessage> SendAsync(HttpRequestMessage message);
     }
 }
