@@ -4,34 +4,33 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PcfAzureConfigurator.Helpers;
 using PcfAzureConfigurator.Helpers.Azure;
-using Microsoft.Extensions.Primitives;
-using PcfAzureConfigurator.Helpers.Azure.ResourceGroups;
+using PcfAzureConfigurator.Helpers;
+using PcfAzureConfigurator.Helpers.Azure.Deployments;
 
 namespace PcfAzureConfigurator.Controllers.Azure
 {
-    [Route("api/v0/azure/{environment}/subscriptions/{subscriptionId}/resourcegroups")]
+    [Route("api/v0/azure/{environment}/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/deployments")]
     [Produces("application/json")]
-    public class ResourceGroupsController : Controller
+    public class DeploymentsController : Controller
     {
-        private IResourceGroupsHelper _resourceGroupsHelper;
+        private IDeploymentsHelper _deploymentsHelper;
 
-        public ResourceGroupsController(IResourceGroupsHelper resourceGroupsHelper)
+        public DeploymentsController(IDeploymentsHelper deploymentsHelper)
         {
-            _resourceGroupsHelper = resourceGroupsHelper;
+            _deploymentsHelper = deploymentsHelper;
         }
 
         [HttpGet]
-        public async Task<JsonResult> List(string environment, string subscriptionId)
+        public async Task<JsonResult> List(string environment, string subscriptionId, string resourceGroupName)
         {
             var token = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try
             {
-                var resourceGroups = await _resourceGroupsHelper.List(environment, token, subscriptionId);
-                result = new JsonResult(new { result = resourceGroups });
+                var deployments = await _deploymentsHelper.List(environment, token, subscriptionId, resourceGroupName);
+                result = new JsonResult(new { result = deployments });
             }
             catch (HttpResponseException e)
             {
@@ -41,16 +40,16 @@ namespace PcfAzureConfigurator.Controllers.Azure
             return result;
         }
 
-        [Route("{resourceGroupName}")]
+        [Route("{deploymentName}")]
         [HttpPut]
-        public async Task<JsonResult> Create(string environment, string subscriptionId, string resourceGroupName, [FromBody] ResourceGroup resourceGroup)
+        public async Task<JsonResult> Create(string environment, string subscriptionId, string resourceGroupName, string deploymentName, [FromBody] DeploymentProperties properties)
         {
             var token = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try
             {
-                await _resourceGroupsHelper.Create(environment, token, subscriptionId, resourceGroupName, resourceGroup);
+                await _deploymentsHelper.Create(environment, token, subscriptionId, resourceGroupName, deploymentName, properties);
                 result = new JsonResult(null);
             }
             catch (HttpResponseException e)
@@ -61,17 +60,17 @@ namespace PcfAzureConfigurator.Controllers.Azure
             return result;
         }
 
-        [Route("{resourceGroupName}")]
+        [Route("{deploymentName}")]
         [HttpGet]
-        public async Task<JsonResult> Get(string environment, string subscriptionId, string resourceGroupName)
+        public async Task<JsonResult> Get(string environment, string subscriptionId, string resourceGroupName, string deploymentName)
         {
             var token = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try
             {
-                var resourceGroup = await _resourceGroupsHelper.Get(environment, token, subscriptionId, resourceGroupName);
-                result = new JsonResult(new { result = resourceGroup });
+                var deployment = await _deploymentsHelper.Get(environment, token, subscriptionId, resourceGroupName, deploymentName);
+                result = new JsonResult(new { result = deployment });
             }
             catch (HttpResponseException e)
             {

@@ -10,18 +10,18 @@ namespace PcfAzureConfigurator.Helpers.OpsManager
 {
     public class DirectorHelper : IDirectorHelper
     {
-        private IHttpClientProvider _httpClientProvider;
+        private IHttpClient _httpClient;
 
-        public DirectorHelper(IHttpClientProvider httpClientProvider)
+        public DirectorHelper(IHttpClient httpClient)
         {
-            _httpClientProvider = httpClientProvider;
+            _httpClient = httpClient;
         }
 
         public async Task<DirectorProperties> GetProperties(string opsManagerFqdn, string token)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://" + opsManagerFqdn + "/api/v0/staged/director/properties");
             requestMessage.Headers.Authorization = OauthToken.GetAuthenticationHeader(token);
-            var response = await _httpClientProvider.HttpClient.SendAsync(requestMessage);
+            var response = await _httpClient.SendAsync(requestMessage);
 
             if (response.IsSuccessStatusCode)
             {

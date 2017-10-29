@@ -16,9 +16,13 @@ namespace PcfAzureConfigurator.Helpers.Azure
                     resourceManager: "https://management.azure.com"
                     ),
                 armApiVersions: new ArmApiVersions(
-                    resourceGroups: "2017-05-10"
+                    resourceGroups: "2017-05-10",
+                    storage: "2017-06-01",
+                    subscriptions: "2016-06-01",
+                    virtualMachines: "2016-04-30-preview"
                     )
                 ) },
+            /*
             { "AzureUSGovernment", new AzureEnvironment(
                 endpoints: new Endpoints(
                     activeDirectory: "https://login-us.microsoftonline.com", 
@@ -31,12 +35,13 @@ namespace PcfAzureConfigurator.Helpers.Azure
             { "AzureGermanCloud", new AzureEnvironment(
                 endpoints: new Endpoints(
                     activeDirectory: "https://login.microsoftonline.de",
-                    resourceManager: "https://management.microsoftazure.de"
+                    resourceManager: "https://management.microsoftazure.de",
                     ),
                 armApiVersions: new ArmApiVersions(
                     resourceGroups: null
                     )
                 ) },
+                */
             // Not currently suppoorted in OpsManager
             // { "AzureChinaCloud", new AzureEnvironment(activeDirectoryEndpointUrl: "https://login.chinacloudapi.cn", resourceManagerEndpointUrl: "https://management.chinacloudapi.cn") },
         };
@@ -59,6 +64,7 @@ namespace PcfAzureConfigurator.Helpers.Azure
     {
         public string ActiveDirectory { get; set; }
         public string ResourceManager { get; set; }
+        public string Storage { get; set; }
 
         public Endpoints(string activeDirectory, string resourceManager)
         {
@@ -70,10 +76,16 @@ namespace PcfAzureConfigurator.Helpers.Azure
     public class ArmApiVersions
     {
         public string ResourceGroups { get; set; }
+        public string Storage { get; set; }
+        public string Subscriptions { get; set; }
+        public string VirtualMachines { get; set; }
 
-        public ArmApiVersions(string resourceGroups)
+        public ArmApiVersions(string resourceGroups, string storage, string subscriptions, string virtualMachines)
         {
             ResourceGroups = resourceGroups;
+            Storage = storage;
+            Subscriptions = subscriptions;
+            VirtualMachines = virtualMachines;
         }
     }
 }

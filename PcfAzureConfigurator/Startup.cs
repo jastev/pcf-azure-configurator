@@ -26,12 +26,19 @@ namespace PcfAzureConfigurator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
+            // General
+            services.AddSingleton<IHttpClient, HttpClientAdapter>();
             services.AddSingleton<IOauthHelper, OauthHelper>();
+            // Azure
+            services.AddSingleton<IActiveDirectoryHelper, ActiveDirectoryHelper>();
+            services.AddSingleton<ISubscriptionsHelper, SubscriptionsHelper>();
+            services.AddSingleton<IResourceGroupsHelper, ResourceGroupsHelper>();
+            services.AddSingleton<ILocationsHelper, LocationsHelper>();
+            services.AddSingleton<IStorageHelper, StorageHelper>();
+            services.AddSingleton<IDeploymentsHelper, DeploymentsHelper>();
+            // OpsManager
             services.AddSingleton<IUaaHelper, UaaHelper>();
             services.AddSingleton<IDirectorHelper, DirectorHelper>();
-            services.AddSingleton<IActiveDirectoryHelper, ActiveDirectoryHelper>();
-            services.AddSingleton<IResourceGroupsHelper, ResourceGroupsHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

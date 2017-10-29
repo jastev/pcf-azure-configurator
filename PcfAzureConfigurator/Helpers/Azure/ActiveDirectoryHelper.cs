@@ -16,8 +16,7 @@ namespace PcfAzureConfigurator.Helpers.Azure
 
         public async Task<OauthToken> GetToken(string environmentName, string tenantId, string clientId, string clientSecret)
         {
-            AzureEnvironment environment;
-            EnvironmentHelper.Environments.TryGetValue(environmentName, out environment);
+            EnvironmentHelper.Environments.TryGetValue(environmentName, out AzureEnvironment environment);
             var uri = environment.Endpoints.ActiveDirectory + "/" + tenantId + "/oauth2/token";
             var parameters = new Dictionary<string, string>
             {
