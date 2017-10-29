@@ -41,15 +41,16 @@ namespace PcfAzureConfigurator.Controllers.Azure
             return result;
         }
 
-        [HttpPost]
-        public async Task<JsonResult> Create(string environment, string subscriptionId, [FromBody] ResourceGroup resourceGroup)
+        [Route("{resourceGroupName}")]
+        [HttpPut]
+        public async Task<JsonResult> Create(string environment, string subscriptionId, string resourceGroupName, [FromBody] ResourceGroup resourceGroup)
         {
             var token = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try
             {
-                await _resourceGroupsHelper.Create(environment, token, subscriptionId, resourceGroup);
+                await _resourceGroupsHelper.Create(environment, token, subscriptionId, resourceGroupName, resourceGroup);
                 result = new JsonResult(null);
             }
             catch (HttpResponseException e)

@@ -9,7 +9,7 @@ namespace PcfAzureConfigurator.Helpers.Azure
     public interface IResourceGroupsHelper
     {
         Task<ResourceGroup[]> List(string environmentName, string token, string subcriptionId);
-        Task Create(string environmentName, string token, string subcriptionId, ResourceGroup resourceGroup);
+        Task Create(string environmentName, string token, string subcriptionId, string resourceGroupName, ResourceGroup resourceGroup);
         Task<ResourceGroup> Get(string environmentName, string token, string subcriptionId, string resourceGroupName);
     }
 }

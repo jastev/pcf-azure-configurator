@@ -39,10 +39,10 @@ namespace PcfAzureConfigurator.Helpers.Azure
             }
         }
 
-        public async Task Create(string environmentName, string token, string subscriptionId, ResourceGroup resourceGroup)
+        public async Task Create(string environmentName, string token, string subscriptionId, string resourceGroupName, ResourceGroup resourceGroup)
         {
             EnvironmentHelper.Environments.TryGetValue(environmentName, out AzureEnvironment environment);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Put, environment.Endpoints.ResourceManager + "/subscriptions/" + subscriptionId + "/resourcegroups/" + resourceGroup.Name + "?api-version=" + environment.ArmApiVersions.ResourceGroups);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, environment.Endpoints.ResourceManager + "/subscriptions/" + subscriptionId + "/resourcegroups/" + resourceGroupName + "?api-version=" + environment.ArmApiVersions.ResourceGroups);
             requestMessage.Headers.Authorization = OauthToken.GetAuthenticationHeader(token);
             requestMessage.Content = new StringContent(JsonConvert.SerializeObject(resourceGroup), Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(requestMessage);

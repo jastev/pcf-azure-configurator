@@ -43,6 +43,26 @@ namespace PcfAzureConfigurator.Controllers.Azure
         }
 
         [Route("{storageAccountName}")]
+        [HttpPut]
+        public async Task<JsonResult> CreateAccount(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, [FromBody] StorageAccount storageAccount)
+        {
+            var token = OauthToken.GetToken(HttpContext.Request.Headers);
+
+            JsonResult result;
+            try
+            {
+                await _storageHelper.CreateAccount(environment, token, subscriptionId, resourceGroupName, storageAccount);
+                result = new JsonResult(null);
+            }
+            catch (HttpResponseException e)
+            {
+                result = new JsonResult(new { error = e.Response.Content });
+                result.StatusCode = (int)e.Response.StatusCode;
+            }
+            return result;
+        }
+
+        [Route("{storageAccountName}")]
         [HttpGet]
         public async Task<JsonResult> GetAccount(string environment, string subscriptionId, string resourceGroupName, string storageAccountName)
         {
@@ -53,25 +73,6 @@ namespace PcfAzureConfigurator.Controllers.Azure
             {
                 var account = await _storageHelper.GetAccount(environment, token, subscriptionId, resourceGroupName, storageAccountName);
                 result = new JsonResult(new { result = account });
-            }
-            catch (HttpResponseException e)
-            {
-                result = new JsonResult(new { error = e.Response.Content });
-                result.StatusCode = (int)e.Response.StatusCode;
-            }
-            return result;
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> CreateAccount(string environment, string subscriptionId, string resourceGroupName, [FromBody] StorageAccount storageAccount)
-        {
-            var token = OauthToken.GetToken(HttpContext.Request.Headers);
-
-            JsonResult result;
-            try
-            {
-                await _storageHelper.CreateAccount(environment, token, subscriptionId, resourceGroupName, storageAccount);
-                result = new JsonResult(null);
             }
             catch (HttpResponseException e)
             {
@@ -123,16 +124,16 @@ namespace PcfAzureConfigurator.Controllers.Azure
             return result;
         }
 
-        [Route("{storageAccountName}/containers")]
-        [HttpPost]
-        public async Task<JsonResult> CreateContainer(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, [FromBody] BlobContainer container)
+        [Route("{storageAccountName}/containers/{containerName}")]
+        [HttpPut]
+        public async Task<JsonResult> CreateContainer(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, string containerName)
         {
             var connectionString = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try
             {
-                await _storageHelper.CreateContainer(connectionString, container.Name);
+                await _storageHelper.CreateContainer(connectionString, containerName);
                 result = new JsonResult(null);
             }
             catch (HttpResponseException e)
@@ -165,16 +166,16 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
         }
 
-        [Route("{storageAccountName}/containers/{containerName}")]
-        [HttpPost]
-        public async Task<JsonResult> CopyBlob(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, string containerName, [FromBody] Blob blob)
+        [Route("{storageAccountName}/containers/{containerName}/blobs/{blobName}")]
+        [HttpPut]
+        public async Task<JsonResult> CopyBlob(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, string containerName, string blobName, [FromBody] string sourceUri)
         {
             var connectionString = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try
             {
-                await _storageHelper.CopyBlob(connectionString, containerName, blob.Name, blob.CopyState.Source.ToString());
+                await _storageHelper.CopyBlob(connectionString, containerName, blobName, sourceUri);
                 result = new JsonResult(null);
             }
             catch (HttpResponseException e)
@@ -229,16 +230,16 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
         }
 
-        [Route("{storageAccountName}/tables")]
-        [HttpPost]
-        public async Task<JsonResult> CreateTable(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, [FromBody] Table table)
+        [Route("{storageAccountName}/tables/{tableName}")]
+        [HttpPut]
+        public async Task<JsonResult> CreateTable(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, string tableName)
         {
             var connectionString = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try
             {
-                await _storageHelper.CreateTable(connectionString, table.Name);
+                await _storageHelper.CreateTable(connectionString, tableName);
                 result = new JsonResult(null);
             }
             catch (HttpResponseException e)
