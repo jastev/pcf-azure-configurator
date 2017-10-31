@@ -23,15 +23,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\app\components\azuresetup\azureSetup.component.ts" />
     <None Remove="ClientApp\app\services\azure\activedirectory.service.ts" />
+    <None Remove="ClientApp\app\services\azure\deployments.service.ts" />
+    <None Remove="ClientApp\app\services\azure\locations.service.ts" />
     <None Remove="ClientApp\app\services\azure\resourcegroups.service.ts" />
+    <None Remove="ClientApp\app\services\azure\storage.service.ts" />
+    <None Remove="ClientApp\app\services\azure\subscriptions.service.ts" />
     <None Remove="ClientApp\app\services\oauthtoken.ts" />
     <None Remove="ClientApp\app\services\serviceresult.ts" />
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\app\components\azuresetup\azuresetup.component.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\azure\activedirectory.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\azure\deployments.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\azure\locations.service.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\azure\resourcegroups.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\azure\storage.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\services\azure\subscriptions.service.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\oauthtoken.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\opsmanager\director.service.ts" />
     <TypeScriptCompile Include="ClientApp\app\services\opsmanager\uaa.service.ts" />

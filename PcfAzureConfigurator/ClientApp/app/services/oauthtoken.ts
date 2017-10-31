@@ -1,5 +1,5 @@
 ﻿export interface OauthToken {
     access_token: string;
-    token_type: string;
-    expires_in: number;
+    token_type?: string;
+    expires_in?: number;
 }

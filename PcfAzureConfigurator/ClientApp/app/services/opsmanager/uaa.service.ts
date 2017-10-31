@@ -6,8 +6,6 @@ import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class UaaService {
-    public token: OauthToken;
-    private timestamp: number;
     private http: Http;
     private baseUrl: string;
 
@@ -18,8 +16,6 @@ export class UaaService {
 
     getToken(opsManagerFqdn: string, username: string, password: string): Promise<OauthToken> {
         return new Promise<OauthToken>((resolve, reject) => {
-            let now = Date.now();
-            if (this.token && (this.token.expires_in - 60) * 1000 + this.timestamp > now) return resolve(this.token);  
             let uri = this.baseUrl + 'api/v0/opsmanager/uaa/token';
             let body = { 'OpsManagerFqdn': opsManagerFqdn, 'Username': username, 'Password': password };
             this.http.post(uri, body).toPromise()
@@ -30,9 +26,8 @@ export class UaaService {
                         reject(error);
                     }
                     else {
-                        this.token = serviceResult.result as OauthToken;
-                        this.timestamp = now;
-                        resolve(this.token);
+                        let token = serviceResult.result as OauthToken;
+                        resolve(token);
                     }
                 });
         });

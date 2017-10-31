@@ -22,12 +22,12 @@ namespace PcfAzureConfigurator.Controllers
 
         [Route("client/{clientId}/authenticate")]
         [HttpPost]
-        public async Task<JsonResult> GetToken(string environment, string tenantId, string clientId, [FromBody] string clientSecret)
+        public async Task<JsonResult> GetToken(string environment, string tenantId, string clientId, [FromBody] AuthenticationRequest authenticationRequest)
         {
             JsonResult result;
             try
             {
-                var token = await _activeDirectoryHelper.GetToken(environment, tenantId, clientId, clientSecret);
+                var token = await _activeDirectoryHelper.GetToken(environment, tenantId, clientId, authenticationRequest.ClientSecret);
                 result = new JsonResult(new { result = token });
             }
             catch (HttpResponseException e)
@@ -37,5 +37,10 @@ namespace PcfAzureConfigurator.Controllers
             }
             return result;
         }
+    }
+
+    public class AuthenticationRequest
+    {
+        public string ClientSecret { get; set; }
     }
 }

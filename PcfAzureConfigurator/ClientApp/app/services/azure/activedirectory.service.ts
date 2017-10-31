@@ -6,8 +6,6 @@ import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class ActiveDirectoryService {
-    public token: OauthToken;
-    private timestamp: number;
     private http: Http;
     private baseUrl: string;
 
@@ -18,10 +16,8 @@ export class ActiveDirectoryService {
 
     getToken(environment: string, tenantId: string, clientId: string, clientSecret: string): Promise<OauthToken> {
         return new Promise<OauthToken>((resolve, reject) => {
-            let now = Date.now();
-            if (this.token && (this.token.expires_in - 60) * 1000 + this.timestamp > now) return resolve(this.token);
-            let uri = this.baseUrl + 'api/v0/azure/activedirectory/token';
-            let body = { 'Environment': environment, 'TenantId': tenantId, 'ClientId': clientId, 'ClientSecret': clientSecret };
+            let uri = this.baseUrl + 'api/v0/azure/' + environment + '/activedirectory/' + tenantId + '/client/' + clientId + '/authenticate';
+            let body = { 'clientSecret': clientSecret };
             this.http.post(uri, body).toPromise()
                 .then(response => {
                     let serviceResult = response.json() as ServiceResult;
@@ -30,9 +26,8 @@ export class ActiveDirectoryService {
                         reject(error);
                     }
                     else {
-                        this.token = serviceResult.result as OauthToken;
-                        this.timestamp = now;
-                        resolve(this.token);
+                        let token = serviceResult.result as OauthToken;
+                        resolve(token);
                     }
                 });
         });

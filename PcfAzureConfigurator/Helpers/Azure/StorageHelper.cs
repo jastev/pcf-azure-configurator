@@ -258,6 +258,9 @@ namespace PcfAzureConfigurator.Helpers.Azure.Storage
     public class BlobCopyState
     {
         public string Source { get; set; }
+        public string Status { get; set; }
+        public Nullable<long> BytesCopied { get; set; }
+        public Nullable<long> TotalBytes { get; set; }
     }
 
     public class Table

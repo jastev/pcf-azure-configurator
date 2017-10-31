@@ -1,5 +1,5 @@
 ﻿import { Inject, Injectable } from '@angular/core';
-import { Http, RequestOptionsArgs } from '@angular/http';
+import { Http, Headers } from '@angular/http';
 import { OauthToken } from "../oauthtoken";
 import { ServiceResult } from "../serviceresult";
 import 'rxjs/add/operator/toPromise';

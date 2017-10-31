@@ -1,0 +1,61 @@
+﻿<div>
+    <div>
+        <select [(ngModel)]="environment" (change)="updateToken()" style="width: 300px">
+            <option *ngFor="let e of environments" [ngValue]="e">{{e}}</option>
+        </select>
+    </div>
+    <div>
+        <input [(ngModel)]="tenantId" (change)="updateToken()" placeholder="Tenant Id" style="width: 300px">
+    </div>
+    <div>
+        <input [(ngModel)]="clientId" (change)="updateToken()" placeholder="Client Id" style="width: 300px">
+    </div>
+    <div>
+        <input type="password" [(ngModel)]="clientSecret" (change)="updateToken()" placeholder="Client Secret" style="width: 300px">
+    </div>
+    <div>
+        <select [(ngModel)]="subscription" (change)="updateSubscription()" style="width: 300px">
+            <option *ngFor="let s of subscriptions" [ngValue]="s.subscriptionId">{{s.subscriptionId}}</option>
+        </select>
+    </div>
+    <div>
+        <select [(ngModel)]="resourceGroup" (change)="updateResourceGroup()" style="width: 300px">
+            <option *ngFor="let rg of resourceGroups" [ngValue]="rg.name">{{rg.name}}</option>
+        </select>
+        <button (click)="createResourceGroup()"><span class='glyphicon glyphicon-chevron-left'></span></button>
+        <input [(ngModel)]="newResourceGroup" placeholder="New Resource Group" style="width: 300px">
+        <select [(ngModel)]="location" style="width: 300px">
+            <option *ngFor="let l of locations" [ngValue]="l.name">{{l.displayName}}</option>
+        </select>
+    </div>
+</div>
+<!--
+<div ngShow="resourceGroup">
+    <h1>Storage</h1>
+    <div>
+        <div style="width: 600px; display: table-cell;">
+            <span class='glyphicon glyphicon-ok' style="color: green;"></span>
+            <span class='glyphicon glyphicon-remove' style="color: red;"></span>
+        </div>
+        <div style="display: table-cell;">
+            <label>Account</label>
+            <select [(ngModel)]="storageAccount" (ngModelChange)="updateStorageAccount($event)">
+                <option *ngFor="let acct of storageAccounts" [ngValue]="acct.name">{{acct.name}}</option>
+            </select>
+            <button><span class='glyphicon glyphicon-chevron-left'></span></button>
+            <input [(ngModel="newStorageAccount" )] placeholder="New Storage Account" />
+        </div>
+    </div>
+    <div ngShow="storageAccount">
+        <label>opsman-image</label>
+        <label>vhds</label>
+        <label>opsmanager</label>
+        <label>bosh</label>
+        <label>stemcell</label>
+        <label>image.vhd</label>
+    </div>
+    <div>
+        <label>stemcells</label>
+    </div>
+</div>
+-->

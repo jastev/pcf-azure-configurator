@@ -50,7 +50,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             try
             {
                 await _deploymentsHelper.Create(environment, token, subscriptionId, resourceGroupName, deploymentName, properties);
-                result = new JsonResult(null);
+                result = new JsonResult(new { result = true });
             }
             catch (HttpResponseException e)
             {
