@@ -7,7 +7,6 @@ import 'rxjs/add/operator/toPromise';
 export class ResourceGroupsService {
     private http: Http;
     private baseUrl: string;
-    public resourceGroups: ResourceGroup[];
 
     constructor(http: Http, @Inject('BASE_URL') baseUrl: string) {
         this.http = http;
@@ -20,17 +19,15 @@ export class ResourceGroupsService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        this.resourceGroups = serviceResult.result as ResourceGroup[];
-                        resolve(this.resourceGroups);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let resourceGroups = serviceResult.result as ResourceGroup[];
+                    resolve(resourceGroups);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -42,16 +39,11 @@ export class ResourceGroupsService {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
             let body = new ResourceGroup(resourceGroupName, location);
-            this.http.put(uri, body, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        resolve();
-                    }
+            this.http.put(uri, body, options).toPromise().then(
+                successResponse => { resolve() },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }

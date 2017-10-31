@@ -34,7 +34,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = e.Response.Content });
+                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -54,7 +54,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = e.Response.Content });
+                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -74,7 +74,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = e.Response.Content });
+                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;

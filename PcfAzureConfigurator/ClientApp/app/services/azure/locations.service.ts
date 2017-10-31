@@ -7,7 +7,6 @@ import 'rxjs/add/operator/toPromise';
 export class LocationsService {
     private http: Http;
     private baseUrl: string;
-    public locations: Location[];
 
     constructor(http: Http, @Inject('BASE_URL') baseUrl: string) {
         this.http = http;
@@ -20,17 +19,15 @@ export class LocationsService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        this.locations = serviceResult.result as Location[];
-                        resolve(this.locations);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let locations = serviceResult.result as Location[];
+                    resolve(locations);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -41,17 +38,15 @@ export class LocationsService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let vmSizes = serviceResult.result as VmSize[];
-                        resolve(vmSizes);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let vmSizes = serviceResult.result as VmSize[];
+                    resolve(vmSizes);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }

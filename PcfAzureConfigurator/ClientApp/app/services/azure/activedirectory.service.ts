@@ -18,17 +18,15 @@ export class ActiveDirectoryService {
         return new Promise<OauthToken>((resolve, reject) => {
             let uri = this.baseUrl + 'api/v0/azure/' + environment + '/activedirectory/' + tenantId + '/client/' + clientId + '/authenticate';
             let body = { 'clientSecret': clientSecret };
-            this.http.post(uri, body).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let token = serviceResult.result as OauthToken;
-                        resolve(token);
-                    }
+            this.http.post(uri, body).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let token = serviceResult.result as OauthToken;
+                    resolve(token);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }

@@ -19,17 +19,15 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let accounts = serviceResult.result as StorageAccount[];
-                        resolve(accounts);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let accounts = serviceResult.result as StorageAccount[];
+                    resolve(accounts);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -40,16 +38,11 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.put(uri, account, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        resolve();
-                    }
+            this.http.put(uri, account, options).toPromise().then(
+                successResponse => { resolve() },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -60,17 +53,15 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let account = serviceResult.result as StorageAccount;
-                        resolve(account);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let account = serviceResult.result as StorageAccount;
+                    resolve(account);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -81,17 +72,15 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let connectionString = serviceResult.result as string;
-                        resolve(connectionString);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let connectionString = serviceResult.result as string;
+                    resolve(connectionString);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -102,17 +91,15 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + connectionString })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let containers = serviceResult.result as BlobContainer[];
-                        resolve(containers);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let containers = serviceResult.result as BlobContainer[];
+                    resolve(containers);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -123,16 +110,11 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + connectionString })
             };
-            this.http.put(uri, null, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        resolve();
-                    }
+            this.http.put(uri, null, options).toPromise().then(
+                successResponse => { resolve() },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -143,17 +125,15 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + connectionString })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let blobs = serviceResult.result as Blob[];
-                        resolve(blobs);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let blobs = serviceResult.result as Blob[];
+                    resolve(blobs);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -164,16 +144,11 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + connectionString })
             };
-            this.http.put(uri, sourceUri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        resolve();
-                    }
+            this.http.put(uri, sourceUri, options).toPromise().then(
+                successResponse => { resolve() },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -184,17 +159,15 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + connectionString })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let blob = serviceResult.result as Blob;
-                        resolve(blob);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let blob = serviceResult.result as Blob;
+                    resolve(blob);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -205,17 +178,15 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + connectionString })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let tables = serviceResult.result as Table[];
-                        resolve(tables);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let tables = serviceResult.result as Table[];
+                    resolve(tables);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -226,16 +197,11 @@ export class StorageService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + connectionString })
             };
-            this.http.put(uri, null, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        resolve();
-                    }
+            this.http.put(uri, null, options).toPromise().then(
+                successResponse => { resolve() },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }

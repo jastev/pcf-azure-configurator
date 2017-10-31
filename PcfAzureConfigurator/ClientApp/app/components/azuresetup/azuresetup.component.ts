@@ -1,5 +1,6 @@
 ﻿import { Component, Inject } from '@angular/core';
 import { OauthToken } from '../../services/oauthtoken';
+import { ServiceError } from '../../services/serviceresult';
 import { ActiveDirectoryService } from '../../services/azure/activedirectory.service';
 import { SubscriptionsService, Subscription } from '../../services/azure/subscriptions.service';
 import { ResourceGroupsService, ResourceGroup } from '../../services/azure/resourcegroups.service';
@@ -41,6 +42,7 @@ export class AzureSetupComponent {
     public container: string;
     public blobs: Blob[];
     public blob: Blob | null;
+    public copyBlobFrom: string;
     public tables: Table[];
     public deployments: Deployment[];
     public deployment: string;
@@ -59,7 +61,7 @@ export class AzureSetupComponent {
                     this.token = token;
                     this.updateSubscriptionList();
                 },
-                () => {
+                (error: ServiceError) => {
                     this.token = { 'access_token': '' };
                     this.updateSubscriptionList();
                 }
@@ -84,7 +86,7 @@ export class AzureSetupComponent {
                         this.updateSubscription();
                     }
                 },
-                () => {
+                (error: ServiceError) => {
                     this.subscriptions = [];
                     this.subscription = '';
                     this.updateSubscription();
@@ -116,7 +118,7 @@ export class AzureSetupComponent {
                         this.updateResourceGroup();
                     }
                 },
-                () => {
+                (error: ServiceError) => {
                     this.resourceGroups = [];
                     this.resourceGroup = '';
                     this.updateResourceGroup();
@@ -137,16 +139,17 @@ export class AzureSetupComponent {
     public createResourceGroup() {
         if (this.environment && this.token.access_token && this.subscription && this.newResourceGroup && this.location) {
             this.resourceGroupsService.createResourceGroup(this.environment, this.token.access_token, this.subscription, this.newResourceGroup, this.location).then(
-                () => { // New RG creation request succeeded
+                () => { // Success
                     this.updateResourceGroupsList().then(
-                        () => { // RG list update succeeded
+                        () => { // Success
                             this.resourceGroup = this.newResourceGroup;
                             this.newResourceGroup = '';
                         }
                     );
-                },
-                () => { // New RG creation request failed
-                    // TODO alert the user to the error
+                }
+            ).catch(
+                (error: ServiceError) => {
+                    // TODO resource group was not created, or could not update resource group list
                 }
             );
         }
@@ -165,7 +168,7 @@ export class AzureSetupComponent {
                         this.location = '';
                     }
                 },
-                () => {
+                (error: ServiceError) => {
                     this.locations = [];
                     this.location = '';
                 }
@@ -191,7 +194,7 @@ export class AzureSetupComponent {
                         this.updateStorageAccount();
                     }
                 },
-                () => {
+                (error: ServiceError) => {
                     this.storageAccounts = [];
                     this.storageAccount = '';
                     this.updateStorageAccount();
@@ -212,7 +215,7 @@ export class AzureSetupComponent {
                     this.updateStorageContainerList();
                     this.updateStorageTableList();
                 },
-                () => {
+                (error: ServiceError) => {
                     this.connectionString = '';
                     this.updateStorageContainerList();
                     this.updateStorageTableList();
@@ -228,7 +231,24 @@ export class AzureSetupComponent {
                     this.containers = containers;
                     this.updateBlobList();
                 },
+                (error: ServiceError) => {
+                    this.containers = [];
+                    this.updateBlobList();
+                }
+            );
+        } else {
+            this.containers = [];
+            this.updateBlobList();
+        }
+    }
+
+    public createContainer(name: string) {
+        if (this.environment && this.connectionString && this.subscription && this.resourceGroup && this.storageAccount) {
+            this.storageService.createContainer(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, name).then(
                 () => {
+                    this.updateStorageContainerList();
+                },
+                (error: ServiceError) => {
                     this.containers = [];
                     this.updateBlobList();
                 }
@@ -247,7 +267,7 @@ export class AzureSetupComponent {
                     this.blobs = blobs;
                     this.getBlob();
                 },
-                () => {
+                (error: ServiceError) => {
                     this.blobs = [];
                     this.getBlob();
                 }
@@ -265,7 +285,7 @@ export class AzureSetupComponent {
                     this.blob = blob;
                     this.validateStorage();
                 },
-                () => {
+                (error: ServiceError) => {
                     this.blob = null;
                     this.validateStorage();
                 }
@@ -284,7 +304,7 @@ export class AzureSetupComponent {
                     this.tables = tables;
                     this.validateStorage();
                 },
-                () => {
+                (error: ServiceError) => {
                     this.tables = [];
                     this.validateStorage();
                 }

@@ -19,17 +19,15 @@ export class DeploymentsService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let deployments = serviceResult.result as Deployment[];
-                        resolve(deployments);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let deployments = serviceResult.result as Deployment[];
+                    resolve(deployments);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -40,16 +38,11 @@ export class DeploymentsService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.put(uri, properties, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        resolve();
-                    }
+            this.http.put(uri, properties, options).toPromise().then(
+                successResponse => { resolve() },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
@@ -60,17 +53,15 @@ export class DeploymentsService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let deployment = serviceResult.result as Deployment;
-                        resolve(deployment);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let deployment = serviceResult.result as Deployment;
+                    resolve(deployment);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }

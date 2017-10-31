@@ -19,17 +19,15 @@ export class SubscriptionsService {
             let options = {
                 'headers': new Headers({ 'Authorization': "Bearer " + token })
             };
-            this.http.get(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        let subscriptions = serviceResult.result as Subscription[];
-                        resolve(subscriptions);
-                    }
+            this.http.get(uri, options).toPromise().then(
+                successResponse => {
+                    let serviceResult = successResponse.json() as ServiceResult;
+                    let subscriptions = serviceResult.result as Subscription[];
+                    resolve(subscriptions);
+                },
+                errorResponse => {
+                    let serviceResult = errorResponse.json() as ServiceResult;
+                    reject(serviceResult.error);
                 });
         });
     }
