@@ -20,7 +20,7 @@
     </div>
     <div>
         <select [(ngModel)]="resourceGroup" (change)="updateResourceGroup()" style="width: 300px">
-            <option *ngFor="let rg of resourceGroups" [ngValue]="rg.name">{{rg.name}}</option>
+            <option *ngFor="let rg of resourceGroups" [ngValue]="rg.name">{{rg.name}} ({{rg.location}})</option>
         </select>
         <button (click)="createResourceGroup()"><span class='glyphicon glyphicon-chevron-left'></span></button>
         <input [(ngModel)]="newResourceGroup" placeholder="New Resource Group" style="width: 300px">
@@ -28,24 +28,22 @@
             <option *ngFor="let l of locations" [ngValue]="l.name">{{l.displayName}}</option>
         </select>
     </div>
-<!--
     <div>
-        <select [(ngModel)]="storageAccount" (ngModelChange)="updateStorageAccount($event)">
-            <option *ngFor="let acct of storageAccounts" [ngValue]="acct.name">{{acct.name}}</option>
+        <select [(ngModel)]="storageAccount" (change)="updateStorageAccount()" style="width: 300px">
+            <option *ngFor="let sa of storageAccounts" [ngValue]="sa.name">{{sa.name}}</option>
         </select>
-        <button><span class='glyphicon glyphicon-chevron-left'></span></button>
-        <input [(ngModel="newStorageAccount" )] placeholder="New Storage Account" />
+        <button><span (click)="createStorageAccount()" class='glyphicon glyphicon-chevron-left'></span></button>
+        <input [(ngModel)]="newStorageAccount" placeholder="New Storage Account" />
     </div>
     <div ngShow="storageAccount">
-        <label>opsman-image</label><button (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button>
-        <label>vhds</label><button (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button>
-        <label>opsmanager</label><button (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button>
-        <label>bosh</label><button (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button>
-        <label>stemcell</label><button (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button>
-        <label>image.vhd</label><button (click)="copyBlob('image.vhd')"><span class='glyphicon glyphicon-chevron-left'></span></button><input [(ngModel)]="copyBlobFrom" placeholder="OpsManager Image Source URI" style="width: 300px"/>
+        <label>opsman-image</label><button (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button><br />
+        <label>vhds</label><button (click)="createContainer('vhds')"><span class='glyphicon glyphicon-pencil'></span></button><br />
+        <label>opsmanager</label><button (click)="createContainer('opsmanager')"><span class='glyphicon glyphicon-pencil'></span></button><br />
+        <label>bosh</label><button (click)="createContainer('bosh')"><span class='glyphicon glyphicon-pencil'></span></button><br />
+        <label>stemcell</label><button (click)="createContainer('stemcell')"><span class='glyphicon glyphicon-pencil'></span></button><br />
+        <label>image.vhd</label><button (click)="copyBlob()"><span class='glyphicon glyphicon-chevron-left'></span></button><input [(ngModel)]="copyBlobFrom" placeholder="OpsManager Image Source URI" style="width: 300px"/><br />
     </div>
     <div>
-        <label>stemcells</label><button (click)="createContainer('stemcells')"><span class='glyphicon glyphicon-chevron-left'></span></button>
+        <label>stemcells</label><button (click)="createTable()"><span class='glyphicon glyphicon-pencil'></span></button>
     </div>
--->
 </div>

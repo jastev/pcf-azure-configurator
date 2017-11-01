@@ -1,6 +1,6 @@
 ﻿import { Inject, Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
-import { ServiceResult } from "../serviceresult";
+import { ServiceResult, ServiceError } from "../serviceresult";
 import 'rxjs/add/operator/toPromise';
 
 @Injectable()
@@ -13,39 +13,37 @@ export class ResourceGroupsService {
         this.baseUrl = baseUrl;
     }
 
-    listResourceGroups(environment: string, token: string, subscriptionId: string): Promise<ResourceGroup[]> {
-        return new Promise<ResourceGroup[]>((resolve, reject) => {
-            let uri = this.baseUrl + 'api/v0/azure/' + environment + '/subscriptions/' + subscriptionId + '/resourcegroups';
-            let options = {
-                'headers': new Headers({ 'Authorization': "Bearer " + token })
-            };
-            this.http.get(uri, options).toPromise().then(
-                successResponse => {
-                    let serviceResult = successResponse.json() as ServiceResult;
-                    let resourceGroups = serviceResult.result as ResourceGroup[];
-                    resolve(resourceGroups);
-                },
-                errorResponse => {
-                    let serviceResult = errorResponse.json() as ServiceResult;
-                    reject(serviceResult.error);
-                });
-        });
+    listResourceGroups(environment: string, token: string, subscriptionId: string): Promise<ResourceGroup[] | ServiceError> {
+        let uri = this.baseUrl + 'api/v0/azure/' + environment + '/subscriptions/' + subscriptionId + '/resourcegroups';
+        let options = {
+            'headers': new Headers({ 'Authorization': "Bearer " + token })
+        };
+        return this.http.get(uri, options).toPromise().then(
+            successResponse => {
+                let serviceResult = successResponse.json() as ServiceResult;
+                let resourceGroups = serviceResult.result as ResourceGroup[];
+                return resourceGroups;
+            },
+            errorResponse => {
+                let serviceResult = errorResponse.json() as ServiceResult;
+                let error = serviceResult.result as ServiceError;
+                return error;
+            });
     }
 
-    createResourceGroup(environment: string, token: string, subscriptionId: string, resourceGroupName: string, location: string): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            let uri = this.baseUrl + 'api/v0/azure/' + environment + '/subscriptions/' + subscriptionId + '/resourcegroups/' + resourceGroupName;
-            let options = {
-                'headers': new Headers({ 'Authorization': "Bearer " + token })
-            };
-            let body = new ResourceGroup(resourceGroupName, location);
-            this.http.put(uri, body, options).toPromise().then(
-                successResponse => { resolve() },
-                errorResponse => {
-                    let serviceResult = errorResponse.json() as ServiceResult;
-                    reject(serviceResult.error);
-                });
-        });
+    createResourceGroup(environment: string, token: string, subscriptionId: string, resourceGroupName: string, location: string): Promise<void | ServiceError> {
+        let uri = this.baseUrl + 'api/v0/azure/' + environment + '/subscriptions/' + subscriptionId + '/resourcegroups/' + resourceGroupName;
+        let options = {
+            'headers': new Headers({ 'Authorization': "Bearer " + token })
+        };
+        let body = new ResourceGroup(resourceGroupName, location);
+        return this.http.put(uri, body, options).toPromise().then(
+            successResponse => { },
+            errorResponse => {
+                let serviceResult = errorResponse.json() as ServiceResult;
+                let error = serviceResult.result as ServiceError;
+                return error;
+            });
     }
 }
 

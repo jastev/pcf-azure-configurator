@@ -1,6 +1,5 @@
 ﻿export interface ServiceResult {
-    result?: Object;
-    error?: ServiceError;
+    result: Object;
 }
 
 export interface ServiceError {

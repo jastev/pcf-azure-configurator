@@ -35,7 +35,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -51,11 +51,11 @@ namespace PcfAzureConfigurator.Controllers.Azure
             try
             {
                 await _resourceGroupsHelper.Create(environment, token, subscriptionId, resourceGroupName, resourceGroup);
-                result = new JsonResult(null);
+                result = new JsonResult(new { result = true });
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -75,7 +75,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;

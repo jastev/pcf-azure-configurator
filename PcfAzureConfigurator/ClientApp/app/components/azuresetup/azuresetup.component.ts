@@ -1,11 +1,11 @@
 ﻿import { Component, Inject } from '@angular/core';
-import { OauthToken } from '../../services/oauthtoken';
 import { ServiceError } from '../../services/serviceresult';
+import { OauthToken } from '../../services/oauthtoken';
 import { ActiveDirectoryService } from '../../services/azure/activedirectory.service';
 import { SubscriptionsService, Subscription } from '../../services/azure/subscriptions.service';
 import { ResourceGroupsService, ResourceGroup } from '../../services/azure/resourcegroups.service';
 import { LocationsService, Location } from '../../services/azure/locations.service';
-import { StorageService, StorageAccount, BlobContainer, Blob, Table } from '../../services/azure/storage.service';
+import { StorageService, StorageAccount, AccountSku, BlobContainer, Blob, Table } from '../../services/azure/storage.service';
 import { DeploymentsService, Deployment } from '../../services/azure/deployments.service';
 
 @Component({
@@ -39,7 +39,7 @@ export class AzureSetupComponent {
     public newStorageAccount: string;
     public connectionString: string;
     public containers: BlobContainer[];
-    public container: string;
+    //public container: string;
     public blobs: Blob[];
     public blob: Blob | null;
     public copyBlobFrom: string;
@@ -54,266 +54,231 @@ export class AzureSetupComponent {
         private storageService: StorageService,
         private deploymentsService: DeploymentsService) { }
 
-    public updateToken() {
-        if (this.environment && this.tenantId && this.clientId && this.clientSecret) {
-            this.activeDirectoryService.getToken(this.environment, this.tenantId, this.clientId, this.clientSecret).then(
-                (token: OauthToken) => {
-                    this.token = token;
-                    this.updateSubscriptionList();
-                },
-                (error: ServiceError) => {
-                    this.token = { 'access_token': '' };
-                    this.updateSubscriptionList();
-                }
-            );
-        } else if (this.token.access_token) {
-            this.token = { 'access_token': '' };
-            this.updateSubscriptionList();
-        }
+    public updateToken(): Promise<void> {
+        return this.activeDirectoryService.getToken(this.environment, this.tenantId, this.clientId, this.clientSecret).then(
+            (token: OauthToken) => {
+                this.token = token;
+                this.updateSubscriptionList();
+            },
+            (error: ServiceError) => {
+                this.token = { 'access_token': '' };
+                this.updateSubscriptionList();
+            }
+        );
     }
 
-    public updateSubscriptionList() {
-        if (this.environment && this.token.access_token) {
-            this.subscriptionsService.listSubscriptions(this.environment, this.token.access_token).then(
-                (subscriptions: Subscription[]) => {
-                    this.subscriptions = subscriptions;
-                    if (this.subscriptions.length == 1) {
-                        this.subscription = subscriptions[0].subscriptionId;
-                        this.updateSubscription();
-                    }
-                    else if (!this.subscriptions.find((s) => { return s.subscriptionId == this.subscription })) {
-                        this.subscription = '';
-                        this.updateSubscription();
-                    }
-                },
-                (error: ServiceError) => {
-                    this.subscriptions = [];
+    public updateSubscriptionList(): Promise<void> {
+        return this.subscriptionsService.listSubscriptions(this.environment, this.token.access_token).then(
+            (subscriptions: Subscription[]) => {
+                this.subscriptions = subscriptions;
+                if (this.subscriptions.length == 1) {
+                    this.subscription = subscriptions[0].subscriptionId;
+                    this.updateSubscription();
+                }
+                else if (!this.subscriptions.find((s) => { return s.subscriptionId == this.subscription })) {
                     this.subscription = '';
                     this.updateSubscription();
                 }
-            );
-        } else {
-            this.subscriptions = [];
-            this.subscription = '';
-            this.updateSubscription();
-        }
+            },
+            (error: ServiceError) => {
+                this.subscriptions = [];
+                this.subscription = '';
+                this.updateSubscription();
+            }
+        );
     }
 
-    public updateSubscription() {
-        this.updateResourceGroupsList();
-        this.updateLocationsList();
+    public updateSubscription(): Promise<void[]> {
+        return Promise.all([this.updateResourceGroupsList(), this.updateLocationsList()]);
     }
 
     public updateResourceGroupsList(): Promise<void> {
-        if (this.environment && this.token.access_token && this.subscription) {
-            return this.resourceGroupsService.listResourceGroups(this.environment, this.token.access_token, this.subscription).then(
-                (resourceGroups: ResourceGroup[]) => {
-                    this.resourceGroups = resourceGroups;
-                    if (this.resourceGroups.length == 1) {
-                        this.resourceGroup = resourceGroups[0].name;
-                        this.updateResourceGroup();
-                    }
-                    else if (!this.resourceGroups.find((rg) => { return rg.name == this.resourceGroup })) {
-                        this.resourceGroup = '';
-                        this.updateResourceGroup();
-                    }
-                },
-                (error: ServiceError) => {
-                    this.resourceGroups = [];
+        return this.resourceGroupsService.listResourceGroups(this.environment, this.token.access_token, this.subscription).then(
+            (resourceGroups: ResourceGroup[]) => {
+                this.resourceGroups = resourceGroups;
+                if (this.resourceGroups.length == 1) {
+                    this.resourceGroup = resourceGroups[0].name;
+                    this.updateResourceGroup();
+                }
+                else if (!this.resourceGroups.find((rg) => { return rg.name == this.resourceGroup })) {
                     this.resourceGroup = '';
                     this.updateResourceGroup();
                 }
-            );
-        } else {
-            return new Promise<void>(
-                (resolve, reject) => {
-                    this.resourceGroups = [];
-                    this.resourceGroup = '';
-                    this.updateResourceGroup();
-                    resolve();
-                }
-            );
-        }
+            },
+            (error: ServiceError) => {
+                this.resourceGroups = [];
+                this.resourceGroup = '';
+                this.updateResourceGroup();
+            }
+        );
     }
 
-    public createResourceGroup() {
-        if (this.environment && this.token.access_token && this.subscription && this.newResourceGroup && this.location) {
-            this.resourceGroupsService.createResourceGroup(this.environment, this.token.access_token, this.subscription, this.newResourceGroup, this.location).then(
-                () => { // Success
-                    this.updateResourceGroupsList().then(
-                        () => { // Success
-                            this.resourceGroup = this.newResourceGroup;
-                            this.newResourceGroup = '';
-                        }
-                    );
-                }
-            ).catch(
+    public createResourceGroup(): Promise<void> {
+        return this.resourceGroupsService.createResourceGroup(this.environment, this.token.access_token, this.subscription, this.newResourceGroup, this.location)
+            .then(this.updateResourceGroupsList)
+            .then(() => { // Success
+                this.resourceGroup = this.newResourceGroup;
+                this.newResourceGroup = '';
+                })
+            .catch(
                 (error: ServiceError) => {
                     // TODO resource group was not created, or could not update resource group list
                 }
-            );
-        }
+        );
     }
 
-    public updateResourceGroup() {
-        this.updateStorageAccountList();
+    public updateResourceGroup(): Promise<void> {
+        return this.updateStorageAccountList();
     }
 
-    public updateLocationsList() {
-        if (this.environment && this.token.access_token && this.subscription) {
-            return this.locationsService.listLocations(this.environment, this.token.access_token, this.subscription).then(
-                (locations: Location[]) => {
-                    this.locations = locations;
-                    if (!this.locations.find((l) => { return l.name == this.location })) {
-                        this.location = '';
-                    }
-                },
-                (error: ServiceError) => {
-                    this.locations = [];
+    public updateLocationsList(): Promise<void> {
+        return this.locationsService.listLocations(this.environment, this.token.access_token, this.subscription).then(
+            (locations: Location[]) => {
+                this.locations = locations;
+                if (!this.locations.find((l) => { return l.name == this.location })) {
                     this.location = '';
                 }
-            );
-        } else {
-            return new Promise<void>(
-                (resolve, reject) => {
-                    this.locations = [];
-                    this.location = '';
-                    resolve();
-                }
-            );
-        }
+            },
+            (error: ServiceError) => {
+                this.locations = [];
+                this.location = '';
+            }
+        );
     }
 
-    public updateStorageAccountList() {
-        if (this.environment && this.token.access_token && this.subscription && this.resourceGroup) {
-            this.storageService.listAccounts(this.environment, this.token.access_token, this.subscription, this.resourceGroup).then(
-                (storageAccounts: StorageAccount[]) => {
-                    this.storageAccounts = storageAccounts;
-                    if (!this.storageAccounts.find((sa) => { return sa.name == this.storageAccount })) {
-                        this.storageAccount = '';
-                        this.updateStorageAccount();
-                    }
-                },
-                (error: ServiceError) => {
-                    this.storageAccounts = [];
+    public updateStorageAccountList(): Promise<void> {
+        return this.storageService.listAccounts(this.environment, this.token.access_token, this.subscription, this.resourceGroup).then(
+            (storageAccounts: StorageAccount[]) => {
+                this.storageAccounts = storageAccounts;
+                if (!this.storageAccounts.find((sa) => { return sa.name == this.storageAccount })) {
                     this.storageAccount = '';
                     this.updateStorageAccount();
                 }
-            );
-        } else {
-            this.storageAccounts = [];
-            this.storageAccount = '';
-            this.updateStorageAccount();
-        }
+            },
+            (error: ServiceError) => {
+                this.storageAccounts = [];
+                this.storageAccount = '';
+                this.updateStorageAccount();
+            }
+        );
     }
 
-    public updateStorageAccount() {
-        if (this.storageAccount) {
-            this.storageService.getConnectionString(this.environment, this.token.access_token, this.subscription, this.resourceGroup, this.storageAccount).then(
-                (connectionString: string) => {
-                    this.connectionString = connectionString;
-                    this.updateStorageContainerList();
-                    this.updateStorageTableList();
-                },
-                (error: ServiceError) => {
-                    this.connectionString = '';
-                    this.updateStorageContainerList();
-                    this.updateStorageTableList();
-                }
-            );
-        }
+    public createStorageAccount(): Promise<void> {
+        let account = new StorageAccount();
+        account.name = this.newStorageAccount;
+        account.kind = 'Storage';
+        account.location = 'westus'; //this.resourceGroup.location;
+        account.sku = new AccountSku();
+        account.sku.name = 'Standard_LRS';
+        return this.storageService.createAccount(this.environment, this.token.access_token, this.subscription, this.resourceGroup, this.newStorageAccount, account).then(
+                this.updateStorageAccountList
+                )
+.catch(            (error: ServiceError) => {
+                // TODO alert the user?
+            }
+        );
     }
 
-    public updateStorageContainerList() {
-        if (this.environment && this.connectionString && this.subscription && this.resourceGroup && this.storageAccount) {
-            this.storageService.listContainers(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount).then(
-                (containers: BlobContainer[]) => {
-                    this.containers = containers;
-                    this.updateBlobList();
-                },
-                (error: ServiceError) => {
-                    this.containers = [];
-                    this.updateBlobList();
-                }
-            );
-        } else {
-            this.containers = [];
-            this.updateBlobList();
-        }
+    public updateStorageAccount(): Promise<void> {
+        return this.storageService.getConnectionString(this.environment, this.token.access_token, this.subscription, this.resourceGroup, this.storageAccount).then(
+            (connectionString: string) => {
+                this.connectionString = connectionString;
+                this.updateStorageContainerList();
+                this.updateStorageTableList();
+            },
+            (error: ServiceError) => {
+                this.connectionString = '';
+                this.updateStorageContainerList();
+                this.updateStorageTableList();
+            }
+        );
     }
 
-    public createContainer(name: string) {
-        if (this.environment && this.connectionString && this.subscription && this.resourceGroup && this.storageAccount) {
-            this.storageService.createContainer(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, name).then(
+    public updateStorageContainerList(): Promise<void> {
+        return this.storageService.listContainers(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount).then(
+            (containers: BlobContainer[]) => {
+                this.containers = containers;
+                this.updateBlobList();
+            },
+            (error: ServiceError) => {
+                this.containers = [];
+                this.updateBlobList();
+            }
+        );
+    }
+
+    public createContainer(name: string): Promise<void> {
+            return this.storageService.createContainer(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, name).then(
                 () => {
                     this.updateStorageContainerList();
                 },
                 (error: ServiceError) => {
-                    this.containers = [];
-                    this.updateBlobList();
+                    // TODO alert the user?
                 }
             );
-        } else {
-            this.containers = [];
-            this.updateBlobList();
-        }
     }
 
-    public updateBlobList() {
-        if (this.environment && this.connectionString && this.subscription && this.resourceGroup && this.storageAccount && this.containers
-            && this.containers.find((container: BlobContainer) => { return container.name == 'opsman-image'; })) {
-            this.storageService.listBlobs(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'opsman-image').then(
-                (blobs: Blob[]) => {
-                    this.blobs = blobs;
-                    this.getBlob();
-                },
-                (error: ServiceError) => {
-                    this.blobs = [];
-                    this.getBlob();
-                }
-            );
-        } else {
-            this.blobs = [];
-            this.getBlob();
-        }
+    public updateBlobList() { // Gets the blobs in the opsman-image container
+        return this.storageService.listBlobs(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'opsman-image').then(
+            (blobs: Blob[]) => {
+                this.blobs = blobs;
+                this.getBlob();
+            },
+            (error: ServiceError) => {
+                this.blobs = [];
+                this.getBlob();
+            }
+        );
     }
 
-    public getBlob() {
-        if (this.blobs.find((blob: Blob) => { return blob.name == 'image.vhd'; })) {
-            this.storageService.getBlob(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'opsman-image', 'image.vhd').then(
-                (blob: Blob) => {
-                    this.blob = blob;
-                    this.validateStorage();
-                },
-                (error: ServiceError) => {
-                    this.blob = null;
-                    this.validateStorage();
-                }
-            );
-        }
-        else {
-            this.blob = null;
-            this.validateStorage();
-        }
+    public copyBlob() { // Copy the blob to opsman-image/image.vhd
+        return this.storageService.copyBlob(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'opsman-image', 'image.vhd', this.copyBlobFrom).then(
+            () => {
+                this.updateStorageContainerList();
+            },
+            (error: ServiceError) => {
+                // TODO alert the user?
+            }
+        )
     }
 
-    public updateStorageTableList() {
-        if (this.environment && this.connectionString && this.subscription && this.resourceGroup && this.storageAccount) {
-            this.storageService.listTables(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount).then(
-                (tables: Table[]) => {
-                    this.tables = tables;
-                    this.validateStorage();
-                },
-                (error: ServiceError) => {
-                    this.tables = [];
-                    this.validateStorage();
-                }
-            );
-        } else {
-            this.tables = [];
-            this.validateStorage();
-        }
+    public getBlob(): Promise<void> { // Gets the image.vhd blob in the opsman-image container
+        return this.storageService.getBlob(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'opsman-image', 'image.vhd').then(
+            (blob: Blob) => {
+                this.blob = blob;
+                this.validateStorage();
+            },
+            (error: ServiceError) => {
+                this.blob = null;
+                this.validateStorage();
+            }
+        );
     }
+
+    public updateStorageTableList(): Promise<void> {
+        return this.storageService.listTables(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount).then(
+            (tables: Table[]) => {
+                this.tables = tables;
+                this.validateStorage();
+            },
+            (error: ServiceError) => {
+                this.tables = [];
+                this.validateStorage();
+            }
+        );
+    }
+
+    public createTable() { // Create the 'stemcells' table
+        return this.storageService.createTable(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'stemcells').then(
+            () => {
+                this.updateStorageTableList();
+            },
+            (error: ServiceError) => {
+                // TODO alert the user?
+            }
+        )
+    }
+
 
     public validateStorage() {
         if (

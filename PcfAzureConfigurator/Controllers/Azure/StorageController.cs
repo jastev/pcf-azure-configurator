@@ -36,7 +36,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -56,7 +56,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -76,7 +76,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -96,7 +96,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -118,7 +118,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -138,7 +138,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -159,7 +159,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
                 }
                 catch (HttpResponseException e)
                 {
-                    result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                    result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                     result.StatusCode = (int)e.Response.StatusCode;
                 }
                 return result;
@@ -168,19 +168,19 @@ namespace PcfAzureConfigurator.Controllers.Azure
 
         [Route("{storageAccountName}/containers/{containerName}/blobs/{blobName}")]
         [HttpPut]
-        public async Task<JsonResult> CopyBlob(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, string containerName, string blobName, [FromBody] string sourceUri)
+        public async Task<JsonResult> CopyBlob(string environment, string subscriptionId, string resourceGroupName, string storageAccountName, string containerName, string blobName, [FromBody] BlobCopySource source)
         {
             var connectionString = OauthToken.GetToken(HttpContext.Request.Headers);
 
             JsonResult result;
             try
             {
-                await _storageHelper.CopyBlob(connectionString, containerName, blobName, sourceUri);
+                await _storageHelper.CopyBlob(connectionString, containerName, blobName, source.Uri);
                 result = new JsonResult(new { result = true });
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
@@ -201,7 +201,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
                 }
                 catch (HttpResponseException e)
                 {
-                    result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                    result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                     result.StatusCode = (int)e.Response.StatusCode;
                 }
                 return result;
@@ -223,7 +223,7 @@ namespace PcfAzureConfigurator.Controllers.Azure
                 }
                 catch (HttpResponseException e)
                 {
-                    result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                    result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                     result.StatusCode = (int)e.Response.StatusCode;
                 }
                 return result;
@@ -244,10 +244,15 @@ namespace PcfAzureConfigurator.Controllers.Azure
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { error = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
                 result.StatusCode = (int)e.Response.StatusCode;
             }
             return result;
         }
+    }
+
+    public class BlobCopySource
+    {
+        public string Uri { get; set; }
     }
 }

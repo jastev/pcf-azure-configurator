@@ -1,7 +1,7 @@
 ﻿import { Inject, Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { OauthToken } from "../oauthtoken";
-import { ServiceResult } from "../serviceresult";
+import { ServiceResult, ServiceError } from "../serviceresult";
 import 'rxjs/add/operator/toPromise';
 
 @Injectable()
@@ -15,26 +15,23 @@ export class DirectorService {
         this.baseUrl = baseUrl;
     }
 
-    getProperties(address: string, token: OauthToken): Promise<DirectorProperties> {
-        return new Promise<DirectorProperties>((resolve, reject) => {
-            let uri = this.baseUrl + 'api/v0/opsmanager/director';
-            let options = {
-                'headers': new Headers({ 'Authorization': "Bearer " + token }),
-                'parameters': { 'OpsManagerFqdn': address }
-            };
-            this.http.post(uri, options).toPromise()
-                .then(response => {
-                    let serviceResult = response.json() as ServiceResult;
-                    if (serviceResult.hasOwnProperty('error')) {
-                        let error = serviceResult.error;
-                        reject(error);
-                    }
-                    else {
-                        this.properties = serviceResult.result as DirectorProperties;
-                        resolve(this.properties);
-                    }
-                });
-        });
+    getProperties(address: string, token: OauthToken): Promise<DirectorProperties | ServiceError> {
+        let uri = this.baseUrl + 'api/v0/opsmanager/director';
+        let options = {
+            'headers': new Headers({ 'Authorization': "Bearer " + token }),
+            'parameters': { 'OpsManagerFqdn': address }
+        };
+        return this.http.post(uri, options).toPromise().then(
+            successResponse => {
+                let serviceResult = successResponse.json() as ServiceResult;
+                let subscriptions = serviceResult.result as DirectorProperties;
+                return subscriptions;
+            },
+            errorResponse => {
+                let serviceResult = errorResponse.json() as ServiceResult;
+                let error = serviceResult.result as ServiceError;
+                return error;
+            });
     }
 }
 
