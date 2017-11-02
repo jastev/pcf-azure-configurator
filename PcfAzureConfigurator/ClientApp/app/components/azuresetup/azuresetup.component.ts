@@ -6,7 +6,7 @@ import { SubscriptionsService, Subscription } from '../../services/azure/subscri
 import { ResourceGroupsService, ResourceGroup } from '../../services/azure/resourcegroups.service';
 import { LocationsService, Location } from '../../services/azure/locations.service';
 import { StorageService, StorageAccount, AccountSku, BlobContainer, Blob, Table } from '../../services/azure/storage.service';
-import { DeploymentsService, Deployment } from '../../services/azure/deployments.service';
+import { DeploymentsService, Deployment, DeploymentProperties, TemplateLink } from '../../services/azure/deployments.service';
 
 @Component({
     selector: 'azuresetup',
@@ -44,6 +44,7 @@ export class AzureSetupComponent {
     public blob: Blob | null;
     public copyBlobFrom: string;
     public tables: Table[];
+    public adminSshKey: string;
     public deployments: Deployment[];
     public deployment: string;
 
@@ -128,6 +129,7 @@ export class AzureSetupComponent {
     }
 
     public updateResourceGroup(): Promise<void> {
+        //TODO this.location = this.resourceGroup.name;
         return this.updateStorageAccountList();
     }
 
@@ -218,7 +220,7 @@ export class AzureSetupComponent {
             );
     }
 
-    public updateBlobList() { // Gets the blobs in the opsman-image container
+    public updateBlobList(): Promise<void> { // Gets the blobs in the opsman-image container
         return this.storageService.listBlobs(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'opsman-image').then(
             (blobs: Blob[]) => {
                 this.blobs = blobs;
@@ -231,7 +233,7 @@ export class AzureSetupComponent {
         );
     }
 
-    public copyBlob() { // Copy the blob to opsman-image/image.vhd
+    public copyBlob(): Promise<void> { // Copy the blob to opsman-image/image.vhd
         return this.storageService.copyBlob(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'opsman-image', 'image.vhd', this.copyBlobFrom).then(
             () => {
                 this.updateStorageContainerList();
@@ -268,7 +270,7 @@ export class AzureSetupComponent {
         );
     }
 
-    public createTable() { // Create the 'stemcells' table
+    public createTable(): Promise<void> { // Create the 'stemcells' table
         return this.storageService.createTable(this.environment, this.connectionString, this.subscription, this.resourceGroup, this.storageAccount, 'stemcells').then(
             () => {
                 this.updateStorageTableList();
@@ -293,4 +295,36 @@ export class AzureSetupComponent {
 
         }
     }
+
+    public updateDeploymentsList(): Promise<void> {
+        return this.deploymentsService.listDeployments(this.environment, this.token.access_token, this.subscription, this.resourceGroup).then(
+            (deployments: Deployment[]) => {
+                this.deployments = deployments;
+            },
+            (error: ServiceError) => {
+                this.deployments = [];
+            }
+        );
+    }
+
+    public createDeployment(): Promise<void> { // Create the 'stemcells' table
+        let templateUri = "https://raw.githubusercontent.com/pivotal-cf/pcf-azure-arm-templates/master/azure-deploy.json";
+        let parameters = {
+            Environment: { "value": this.environment },
+            Location: { "value": this.location },
+            OpsManVHDStorageAccount: { "value": this.storageAccount },
+            BlobStorageContainer: { "value": "opsman-image" },
+            AdminSSHKey: { "value": this.adminSshKey },
+        };
+        let properties = new DeploymentProperties("Incremental", parameters, templateUri);
+        return this.deploymentsService.createDeployment(this.environment, this.token.access_token, this.subscription, this.resourceGroup, "pcf", properties).then(
+            () => {
+                this.updateDeploymentsList();
+            },
+            (error: ServiceError) => {
+                // TODO alert the user?
+            }
+        )
+    }
+
 }

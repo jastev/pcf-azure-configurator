@@ -44,6 +44,8 @@ namespace PcfAzureConfigurator.Helpers.Azure
             EnvironmentHelper.Environments.TryGetValue(environmentName, out AzureEnvironment environment);
             var requestMessage = new HttpRequestMessage(HttpMethod.Put, environment.Endpoints.ResourceManager + "/subscriptions/" + subscriptionId + "/resourcegroups/" + resourceGroupName + "/providers/Microsoft.Resources/deployments/" + deploymentName + "?api-version=" + environment.ArmApiVersions.ResourceGroups);
             requestMessage.Headers.Authorization = OauthToken.GetAuthenticationHeader(token);
+            var deployment = new Deployment();
+            deployment.Properties = properties;
             requestMessage.Content = new StringContent(JsonConvert.SerializeObject(properties), Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(requestMessage);
 
@@ -92,7 +94,7 @@ namespace PcfAzureConfigurator.Helpers.Azure.Deployments
     {
         public string Mode { get; set; }
         public Object Parameters { get; set; }
-        public TemplateLink Template { get; set; }
+        public TemplateLink TemplateLink { get; set; }
     }
 
     public class TemplateLink

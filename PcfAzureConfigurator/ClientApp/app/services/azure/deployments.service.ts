@@ -14,7 +14,7 @@ export class DeploymentsService {
     }
 
     listDeployments(environment: string, token: string, subscriptionId: string, resourceGroupName: string): Promise<Deployment[] | ServiceError> {
-        let uri = this.baseUrl + 'api/v0/azure/' + environment + '/subscriptions/' + subscriptionId + '/resourceGroups/' + resourceGroupName + '/deployments';
+        let uri = this.baseUrl + 'api/v0/azure/' + environment + '/subscriptions/' + subscriptionId + '/resourcegroups/' + resourceGroupName + '/deployments';
         let options = {
             'headers': new Headers({ 'Authorization': "Bearer " + token })
         };
@@ -46,7 +46,7 @@ export class DeploymentsService {
     }
 
     getDeployment(environment: string, token: string, subscriptionId: string, resourceGroupName: string, deploymentName: string): Promise<Deployment | ServiceError> {
-        let uri = this.baseUrl + 'api/v0/azure/' + environment + '/subscriptions/' + subscriptionId + '/resourceGroups/' + resourceGroupName + '/deployments/' + deploymentName;
+        let uri = this.baseUrl + 'api/v0/azure/' + environment + '/subscriptions/' + subscriptionId + '/resourcegroups/' + resourceGroupName + '/deployments/' + deploymentName;
         let options = {
             'headers': new Headers({ 'Authorization': "Bearer " + token })
         };
@@ -77,12 +77,12 @@ export class Deployment {
 export class DeploymentProperties {
     public mode: string;
     public parameters: object;
-    public template: TemplateLink;
+    public templateLink: TemplateLink;
 
-    constructor(mode: string, parameters: object, template: TemplateLink) {
+    constructor(mode: string, parameters: object, templateUri: string) {
         this.mode = mode;
         this.parameters = parameters;
-        this.template = template;
+        this.templateLink = new TemplateLink(templateUri);
     }
 }
 

@@ -46,4 +46,8 @@
     <div>
         <label>stemcells</label><button (click)="createTable()"><span class='glyphicon glyphicon-pencil'></span></button>
     </div>
+    <div>
+        <input [(ngModel)]="adminSshKey" type="text" placeholder="Admin SSH Key" />
+        <button (click)="createDeployment()"><span>Deploy!</span></button>
+    </div>
 </div>
