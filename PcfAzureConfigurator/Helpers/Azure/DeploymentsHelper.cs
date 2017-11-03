@@ -46,7 +46,7 @@ namespace PcfAzureConfigurator.Helpers.Azure
             requestMessage.Headers.Authorization = OauthToken.GetAuthenticationHeader(token);
             var deployment = new Deployment();
             deployment.Properties = properties;
-            requestMessage.Content = new StringContent(JsonConvert.SerializeObject(properties), Encoding.UTF8, "application/json");
+            requestMessage.Content = new StringContent(JsonConvert.SerializeObject(deployment), Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(requestMessage);
 
             if (!response.IsSuccessStatusCode)

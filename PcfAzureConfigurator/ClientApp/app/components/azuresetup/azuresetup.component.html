@@ -13,41 +13,59 @@
     <div>
         <input type="password" [(ngModel)]="clientSecret" (change)="updateToken()" placeholder="Client Secret" style="width: 300px">
     </div>
-    <div>
-        <select [(ngModel)]="subscription" (change)="updateSubscription()" style="width: 300px">
+</div>
+<div [hidden]="!token.access_token">
+        <select [(ngModel)]="subscription" [disabled]="!subscriptions" (change)="updateSubscription()" style="width: 300px">
             <option *ngFor="let s of subscriptions" [ngValue]="s.subscriptionId">{{s.subscriptionId}}</option>
         </select>
-    </div>
-    <div>
-        <select [(ngModel)]="resourceGroup" (change)="updateResourceGroup()" style="width: 300px">
-            <option *ngFor="let rg of resourceGroups" [ngValue]="rg.name">{{rg.name}} ({{rg.location}})</option>
-        </select>
-        <button (click)="createResourceGroup()"><span class='glyphicon glyphicon-chevron-left'></span></button>
-        <input [(ngModel)]="newResourceGroup" placeholder="New Resource Group" style="width: 300px">
-        <select [(ngModel)]="location" style="width: 300px">
-            <option *ngFor="let l of locations" [ngValue]="l.name">{{l.displayName}}</option>
-        </select>
-    </div>
-    <div>
-        <select [(ngModel)]="storageAccount" (change)="updateStorageAccount()" style="width: 300px">
-            <option *ngFor="let sa of storageAccounts" [ngValue]="sa.name">{{sa.name}}</option>
-        </select>
-        <button><span (click)="createStorageAccount()" class='glyphicon glyphicon-chevron-left'></span></button>
-        <input [(ngModel)]="newStorageAccount" placeholder="New Storage Account" />
-    </div>
-    <div ngShow="storageAccount">
-        <label>opsman-image</label><button (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button><br />
-        <label>vhds</label><button (click)="createContainer('vhds')"><span class='glyphicon glyphicon-pencil'></span></button><br />
-        <label>opsmanager</label><button (click)="createContainer('opsmanager')"><span class='glyphicon glyphicon-pencil'></span></button><br />
-        <label>bosh</label><button (click)="createContainer('bosh')"><span class='glyphicon glyphicon-pencil'></span></button><br />
-        <label>stemcell</label><button (click)="createContainer('stemcell')"><span class='glyphicon glyphicon-pencil'></span></button><br />
-        <label>image.vhd</label><button (click)="copyBlob()"><span class='glyphicon glyphicon-chevron-left'></span></button><input [(ngModel)]="copyBlobFrom" placeholder="OpsManager Image Source URI" style="width: 300px"/><br />
-    </div>
-    <div>
-        <label>stemcells</label><button (click)="createTable()"><span class='glyphicon glyphicon-pencil'></span></button>
-    </div>
-    <div>
-        <input [(ngModel)]="adminSshKey" type="text" placeholder="Admin SSH Key" />
-        <button (click)="createDeployment()"><span>Deploy!</span></button>
-    </div>
+</div>
+<div [hidden]="!subscription">
+    <select [(ngModel)]="resourceGroup" [disabled]="!resourceGroups" (change)="updateResourceGroup()" style="width: 300px">
+        <option *ngFor="let rg of resourceGroups" [ngValue]="rg.name">{{rg.name}} ({{rg.location}})</option>
+    </select>
+    <button [disabled]="!newResourceGroup || !location" (click)="createResourceGroup()"><span class='glyphicon glyphicon-chevron-left'></span></button>
+    <input [(ngModel)]="newResourceGroup" placeholder="New Resource Group" style="width: 300px">
+    <select [(ngModel)]="location" style="width: 300px">
+        <option *ngFor="let l of locations" [ngValue]="l.name">{{l.displayName}}</option>
+    </select>
+</div>
+<div [hidden]="!resourceGroup">
+    <select [(ngModel)]="storageAccount" (change)="updateStorageAccount()" style="width: 300px">
+        <option *ngFor="let sa of storageAccounts" [ngValue]="sa.name">{{sa.name}}</option>
+    </select>
+    <button [disabled]="!newStorageAccount"><span (click)="createStorageAccount()" class='glyphicon glyphicon-chevron-left'></span></button>
+    <input [(ngModel)]="newStorageAccount" placeholder="New Storage Account" />
+</div>
+<div [hidden]="!storageAccount">
+    <span *ngIf="hasContainerOpsmanImage" class='glyphicon glyphicon-check' style="color:green;"></span>
+    <span *ngIf="!hasContainerOpsmanImage" class='glyphicon glyphicon-remove' style="color:red;"></span>
+    <label>opsman-image</label><button *ngIf="!hasContainerOpsmanImage" (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <br />
+    <span *ngIf="hasBlobImageVhd" class='glyphicon glyphicon-check' style="color:green;"></span>
+    <span *ngIf="!hasBlobImageVhd" class='glyphicon glyphicon-remove' style="color:red;"></span>
+    <label>image.vhd</label><button *ngIf="!hasBlobImageVhd" (click)="copyBlob()"><span class='glyphicon glyphicon-chevron-left'></span></button><input *ngIf="!hasBlobImageVhd" [(ngModel)]="copyBlobFrom" placeholder="OpsManager Image Source URI" style="width: 300px" />
+    <br />
+    <span *ngIf="hasContainerVhds" class='glyphicon glyphicon-check' style="color:green;"></span>
+    <span *ngIf="!hasContainerVhds" class='glyphicon glyphicon-remove' style="color:red;"></span>
+    <label>vhds</label><button *ngIf="!hasContainerVhds" (click)="createContainer('vhds')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <br />
+    <span *ngIf="hasContainerOpsmanager" class='glyphicon glyphicon-check' style="color:green;"></span>
+    <span *ngIf="!hasContainerOpsmanager" class='glyphicon glyphicon-remove' style="color:red;"></span>
+    <label>opsmanager</label><button *ngIf="!hasContainerOpsmanager" (click)="createContainer('opsmanager')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <br />
+    <span *ngIf="hasContainerBosh" class='glyphicon glyphicon-check' style="color:green;"></span>
+    <span *ngIf="!hasContainerBosh" class='glyphicon glyphicon-remove' style="color:red;"></span>
+    <label>bosh</label><button *ngIf="!hasContainerBosh" (click)="createContainer('bosh')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <br />
+    <span *ngIf="hasContainerStemcell" class='glyphicon glyphicon-check' style="color:green;"></span>
+    <span *ngIf="!hasContainerStemcell" class='glyphicon glyphicon-remove' style="color:red;"></span>
+    <label>stemcell</label><button *ngIf="!hasContainerStemcell" (click)="createContainer('stemcell')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <br />
+    <span *ngIf="hasTableStemcells" class='glyphicon glyphicon-check' style="color:green;"></span>
+    <span *ngIf="!hasTableStemcells" class='glyphicon glyphicon-remove' style="color:red;"></span>
+    <label>stemcells</label><button *ngIf="!hasTableStemcells" (click)="createTable()"><span class='glyphicon glyphicon-pencil'></span></button>
+</div>
+<div [hidden]="!(hasContainerOpsmanImage && hasBlobImageVhd && hasContainerVhds && hasContainerOpsmanager && hasContainerBosh && hasContainerStemcell && hasTableStemcells)">
+    <input [(ngModel)]="adminSshKey" type="text" placeholder="Admin SSH Key" />
+    <button (click)="createDeployment()"><span>Deploy!</span></button>
 </div>
