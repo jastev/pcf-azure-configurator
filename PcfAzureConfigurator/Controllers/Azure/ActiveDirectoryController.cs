@@ -32,7 +32,7 @@ namespace PcfAzureConfigurator.Controllers
             }
             catch (HttpResponseException e)
             {
-                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = e.Response.Content } });
+                result = new JsonResult(new { result = new { code = (int)e.Response.StatusCode, data = await e.Response.Content.ReadAsStringAsync() } });
                 result.StatusCode = (int) e.Response.StatusCode;
             }
             return result;

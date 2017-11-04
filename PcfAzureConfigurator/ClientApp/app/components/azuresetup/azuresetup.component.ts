@@ -47,6 +47,7 @@ export class AzureSetupComponent {
     public blobs: Blob[];
     public blob: Blob | null;
     public hasBlobImageVhd: boolean;
+    public copyPercent: number;
     public copyBlobFrom: string;
     public tables: Table[];
     public hasTableStemcells: boolean;
@@ -369,9 +370,11 @@ export class AzureSetupComponent {
             (blob: Blob) => {
                 this.blob = blob;
                 if (blob.copyState.status == '1') {  // Pending
-                    this.sleep(2000).then(this.getBlob);
+                    this.copyPercent = blob.copyState.bytesCopied / blob.copyState.totalBytes * 100;
+                    this.sleep(5000).then(() => { this.getBlob() });
                 }
                 this.hasBlobImageVhd = (this.blob != null && this.blob.copyState.status == '2'); // Success
+                this.copyPercent = Math.trunc(blob.copyState.bytesCopied / blob.copyState.totalBytes * 1000);  // TODO this is wrong, but 100 doesn't work either
             },
             (error: ServiceError) => {
                 this.blob = null;

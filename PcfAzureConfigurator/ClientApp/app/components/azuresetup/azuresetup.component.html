@@ -1,25 +1,31 @@
 ﻿<div>
     <div>
+        <label>Environment: </label>
         <select [(ngModel)]="environment" (change)="updateToken()" style="width: 300px">
             <option *ngFor="let e of environments" [ngValue]="e">{{e}}</option>
         </select>
     </div>
     <div>
+        <label>Tenant ID: </label>
         <input [(ngModel)]="tenantId" (change)="updateToken()" placeholder="Tenant Id" style="width: 300px">
     </div>
     <div>
+        <label>Client ID:</label>
         <input [(ngModel)]="clientId" (change)="updateToken()" placeholder="Client Id" style="width: 300px">
     </div>
     <div>
+        <label>Client Secret:</label>
         <input type="password" [(ngModel)]="clientSecret" (change)="updateToken()" placeholder="Client Secret" style="width: 300px">
     </div>
 </div>
 <div [hidden]="!token.access_token">
-        <select [(ngModel)]="subscription" [disabled]="!subscriptions" (change)="updateSubscription()" style="width: 300px">
-            <option *ngFor="let s of subscriptions" [ngValue]="s.subscriptionId">{{s.subscriptionId}}</option>
-        </select>
+    <label>Subscription: </label>
+    <select [(ngModel)]="subscription" [disabled]="!subscriptions" (change)="updateSubscription()" style="width: 300px">
+        <option *ngFor="let s of subscriptions" [ngValue]="s.subscriptionId">{{s.subscriptionId}}</option>
+    </select>
 </div>
 <div [hidden]="!subscription">
+    <label>Resource Group: </label>
     <select [(ngModel)]="resourceGroup" [disabled]="!resourceGroups" (change)="updateResourceGroup()" style="width: 300px">
         <option *ngFor="let rg of resourceGroups" [ngValue]="rg.name">{{rg.name}} ({{rg.location}})</option>
     </select>
@@ -30,6 +36,7 @@
     </select>
 </div>
 <div [hidden]="!resourceGroup">
+    <label>Storage Account: </label>
     <select [(ngModel)]="storageAccount" (change)="updateStorageAccount()" style="width: 300px">
         <option *ngFor="let sa of storageAccounts" [ngValue]="sa.name">{{sa.name}}</option>
     </select>
@@ -39,33 +46,34 @@
 <div [hidden]="!storageAccount">
     <span *ngIf="hasContainerOpsmanImage" class='glyphicon glyphicon-check' style="color:green;"></span>
     <span *ngIf="!hasContainerOpsmanImage" class='glyphicon glyphicon-remove' style="color:red;"></span>
-    <label>opsman-image</label><button *ngIf="!hasContainerOpsmanImage" (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <label>opsman-image container </label><button *ngIf="!hasContainerOpsmanImage" (click)="createContainer('opsman-image')"><span class='glyphicon glyphicon-pencil'></span></button>
     <br />
     <span *ngIf="hasBlobImageVhd" class='glyphicon glyphicon-check' style="color:green;"></span>
     <span *ngIf="!hasBlobImageVhd" class='glyphicon glyphicon-remove' style="color:red;"></span>
-    <label>image.vhd</label><button *ngIf="!hasBlobImageVhd" (click)="copyBlob()"><span class='glyphicon glyphicon-chevron-left'></span></button><input *ngIf="!hasBlobImageVhd" [(ngModel)]="copyBlobFrom" placeholder="OpsManager Image Source URI" style="width: 300px" />
+    <label>image.vhd blob </label><button *ngIf="!hasBlobImageVhd" (click)="copyBlob()"><span class='glyphicon glyphicon-chevron-left'></span></button><input *ngIf="!hasBlobImageVhd" [(ngModel)]="copyBlobFrom" placeholder="OpsManager Image Source URI" style="width: 300px" /><span *ngIf="blob && blob.copyState.status == '1'">({{copyPercent}}%)</span>
     <br />
     <span *ngIf="hasContainerVhds" class='glyphicon glyphicon-check' style="color:green;"></span>
     <span *ngIf="!hasContainerVhds" class='glyphicon glyphicon-remove' style="color:red;"></span>
-    <label>vhds</label><button *ngIf="!hasContainerVhds" (click)="createContainer('vhds')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <label>vhds container </label><button *ngIf="!hasContainerVhds" (click)="createContainer('vhds')"><span class='glyphicon glyphicon-pencil'></span></button>
     <br />
     <span *ngIf="hasContainerOpsmanager" class='glyphicon glyphicon-check' style="color:green;"></span>
     <span *ngIf="!hasContainerOpsmanager" class='glyphicon glyphicon-remove' style="color:red;"></span>
-    <label>opsmanager</label><button *ngIf="!hasContainerOpsmanager" (click)="createContainer('opsmanager')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <label>opsmanager container </label><button *ngIf="!hasContainerOpsmanager" (click)="createContainer('opsmanager')"><span class='glyphicon glyphicon-pencil'></span></button>
     <br />
     <span *ngIf="hasContainerBosh" class='glyphicon glyphicon-check' style="color:green;"></span>
     <span *ngIf="!hasContainerBosh" class='glyphicon glyphicon-remove' style="color:red;"></span>
-    <label>bosh</label><button *ngIf="!hasContainerBosh" (click)="createContainer('bosh')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <label>bosh container </label><button *ngIf="!hasContainerBosh" (click)="createContainer('bosh')"><span class='glyphicon glyphicon-pencil'></span></button>
     <br />
     <span *ngIf="hasContainerStemcell" class='glyphicon glyphicon-check' style="color:green;"></span>
     <span *ngIf="!hasContainerStemcell" class='glyphicon glyphicon-remove' style="color:red;"></span>
-    <label>stemcell</label><button *ngIf="!hasContainerStemcell" (click)="createContainer('stemcell')"><span class='glyphicon glyphicon-pencil'></span></button>
+    <label>stemcell container </label><button *ngIf="!hasContainerStemcell" (click)="createContainer('stemcell')"><span class='glyphicon glyphicon-pencil'></span></button>
     <br />
     <span *ngIf="hasTableStemcells" class='glyphicon glyphicon-check' style="color:green;"></span>
     <span *ngIf="!hasTableStemcells" class='glyphicon glyphicon-remove' style="color:red;"></span>
-    <label>stemcells</label><button *ngIf="!hasTableStemcells" (click)="createTable()"><span class='glyphicon glyphicon-pencil'></span></button>
+    <label>stemcells table </label><button *ngIf="!hasTableStemcells" (click)="createTable()"><span class='glyphicon glyphicon-pencil'></span></button>
 </div>
 <div [hidden]="!(hasContainerOpsmanImage && hasBlobImageVhd && hasContainerVhds && hasContainerOpsmanager && hasContainerBosh && hasContainerStemcell && hasTableStemcells)">
+    <label>OpsManager Admin SSH Key: </label>
     <input [(ngModel)]="adminSshKey" type="text" placeholder="Admin SSH Key" />
     <button (click)="createDeployment()"><span>Deploy!</span></button>
 </div>
